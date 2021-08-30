@@ -9,7 +9,7 @@ from detection import *
 app = Flask(__name__)
 CORS(app)
 app.config['DEBUG'] = True
-
+index_class={"cpt1":5,"cpt2":6,"cpt3":7}
 
 @app.route('/api/detection', methods=['GET','POST'])
 def detect():
@@ -25,14 +25,24 @@ def detect():
         return jsonify({'message':'error image format!'})
     try:
         image=cv2.imread('getImage.png')
-        detected_image = detection(image)
+        detected_image,classes = detection(image)
+        # cv2.imshow("det",detected_image)
+        # cv2.waitKey(0)
         index,scores=ocr(detected_image)
-        if not index:
-            return jsonify({'message':'ocr nonfunctional'})
-        cv2.imwrite('postImage.png',detected_image)
-        with open('postImage.png', "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
-        return jsonify({'index':index,'scores':scores}) ##'detection':str(encoded_string,'utf-8')
+        # print(index)
+        for class_det in classes:
+            # print(index_class[class_det])
+            # print(classes)
+            if not class_det:
+                return jsonify({'message':'no image detected'})
+            if len(index)==index_class[class_det]:
+                cv2.imwrite('postImage.png',detected_image)
+                with open('postImage.png', "rb") as image_file:
+                    encoded_string = base64.b64encode(image_file.read())
+                return jsonify({'index':index,'scores':scores})
+            else:
+                return jsonify({'message':'ocr nonfunctional'})
+        
     except:
         return jsonify({'message':'ocr or detection error'})
 

@@ -3,7 +3,7 @@ import numpy as np
 import time
 import os
 
-classes = ["mesure"]
+classes = ["cpt1","cpt2","cpt3"]
 
 # generate different colors for different classes 
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
@@ -79,7 +79,7 @@ def detection(image):
     
     # go through the detections remaining
     # after nms and draw bounding box
-    
+    classes_detected=[]
     for i in indices:
         i = i[0]
         box = boxes[i]
@@ -87,9 +87,9 @@ def detection(image):
         y = box[1]
         w = box[2]
         h = box[3]
-        
+        classes_detected.append(classes[class_ids[i]])
     # release resources
     try:
-        return image[int(y):int(y+h),int(x):int(x+w)]
+        return image[int(y):int(y+h),int(x):int(x+w)],classes_detected
     except:
         pass
